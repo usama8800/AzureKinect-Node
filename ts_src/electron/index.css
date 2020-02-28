@@ -1,0 +1,14 @@
+.innerTable {
+    margin-left: 30px;
+}
+
+#main {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+}
+
+img {
+    width: 100%;
+}

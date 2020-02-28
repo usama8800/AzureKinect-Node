@@ -1,0 +1,190 @@
+<html>
+
+<head>
+    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+</head>
+
+<body>
+    <div id="notOpenView">
+        <select id="devices">
+            <option selected disabled>(No available devices)</option>
+        </select> Device S/N
+        <br>
+        <button id="refreshDevices">Refresh Devices</button>
+        <button id="openDevice" disabled>Open Device</button>
+    </div>
+    <div id="openView" style="display:none;">
+        <div id="main">
+            <div id="left">
+                <p>
+                    Device S/N: <span id="sn"></span> <button id="closeDevice">Close Device</button>
+                </p>
+                <form id="config">
+                    <table>
+                        <tr>
+                            <td>
+                                <label><input id="depthCamera" type="checkbox" checked />
+                                    Enable Depth Camera</label>
+                                <table id="depthConfig" class="innerTable">
+                                    <tr>
+                                        <td colspan="2">Depth mode</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label><input type="radio" name="depthMode" value="1">
+                                                NFOV Binned</label>
+                                        </td>
+                                        <td>
+                                            <label><input type="radio" name="depthMode" value="2" checked>
+                                                NFOV Unbinned</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label><input type="radio" name="depthMode" value="3">
+                                                WFOV Binned</label>
+                                        </td>
+                                        <td>
+                                            <label><input type="radio" name="depthMode" value="4">
+                                                WFOV Unbinned</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label><input type="radio" name="depthMode" value="5">
+                                                Passive IR</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label><input id="colorCamera" type="checkbox" checked />
+                                    Enable Color Camera</label>
+                                <div id="colorConfig" class="innerTable">
+                                    <table>
+                                        <tr>
+                                            <td colspan="4">Format</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label><input type="radio" name="colorFormat" value="3">
+                                                    BGRA</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorFormat" value="0" checked>
+                                                    MJPG</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorFormat" value="1">
+                                                    NV12</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorFormat" value="2">
+                                                    YUY2</label>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table>
+                                        <tr>
+                                            <td colspan="2">
+                                                Resolution
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="1" checked>
+                                                    720p</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="2">
+                                                    1080p</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="3">
+                                                    1440p</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="5">
+                                                    2160p</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="4">
+                                                    1536p</label>
+                                            </td>
+                                            <td>
+                                                <label><input type="radio" name="colorResolution" value="6">
+                                                    3072p</label>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Framerate
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label><input type="radio" name="cameraFPS" value="2" checked />
+                                                30 FPS</label>
+                                        </td>
+                                        <td>
+                                            <label><input type="radio" name="cameraFPS" value="1" />
+                                                15 FPS</label>
+                                        </td>
+                                        <td>
+                                            <label><input type="radio" name="cameraFPS" value="0" />
+                                                5 FPS</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label><input id="disableStreamingIndicator" type="checkbox" />
+                                    Disabled streaming LED</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Internal Sync
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label><input id="synchronizedImagesOnly" type="checkbox" checked />
+                                                Synchronized images only</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label><input type="number" name="depthDelayOffColorUsec" value="1" />
+                                                Depth delay (us)</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <div>
+                    <button id="startButton">Start</button>
+                    <button id="stopButton" style="display: none;">Stop</button>
+                </div>
+            </div>
+            <div id="right">
+                <img id="colorImage" style="display: none;">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,15 +1,20 @@
 import bindings from 'bindings';
-import { Config } from './defs';
-const kinect = bindings('myaddon')
+import { Config, ImageType, Result, WaitResult } from './defs';
+import { KinectImage } from './kinectImage';
+const kinect = bindings('azurekinect_node');
+
+const colorImage = new KinectImage(ImageType.COLOR);
 
 export class Kinect {
 
-    open(deviceNumber = 0) {
-        const res = kinect.open(deviceNumber);
-        if (res === 1) {
-            throw new Error('Could not connect to device');
-        }
-        return true;
+    getNumConnectedDevices(): number {
+        return kinect.getNumConnectedDevices();
+    }
+
+    open(deviceNumber?: number): Result {
+        let res: Result;
+        if (deviceNumber) { res = kinect.open(deviceNumber); } else { res = kinect.open(); }
+        return res;
     }
 
     close() {
@@ -24,12 +29,34 @@ export class Kinect {
         return kinect.getSerialNumber();
     }
 
-    startCameras(config?: Config) {
-        if (config) kinect.startCameras(config);
-        else kinect.startCameras();
+    startCameras(config?: Config): Result {
+        let res: Result;
+        if (config) { res = kinect.startCameras(config); } else { res = kinect.startCameras(); }
+        return res;
     }
 
     stopCameras() {
         kinect.stopCameras();
+    }
+
+    capture(timeout?: number): WaitResult {
+        let res: WaitResult;
+        if (timeout) { res = kinect.capture(timeout); } else { res = kinect.capture(); }
+        return res;
+    }
+
+    getColorImage(): KinectImage | undefined {
+        const res = kinect.getColorImage();
+        if (res) { return colorImage; }
+        return undefined;
+    }
+
+    releaseImagesAndCapture() {
+        kinect.releaseImagesAndCapture();
+    }
+
+    getImageBuffer(image: KinectImage): Int8Array {
+        const data = kinect.getImageBuffer(image.type);
+        return data;
     }
 }

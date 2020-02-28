@@ -5,7 +5,11 @@ KinectDevice::KinectDevice() {
     config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
     config.camera_fps = K4A_FRAMES_PER_SECOND_15;
     config.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
-    config.color_resolution = K4A_COLOR_RESOLUTION_1080P;
+    config.color_resolution = K4A_COLOR_RESOLUTION_720P;
+}
+
+uint32_t KinectDevice::get_num_connected_devices() {
+    return k4a_device_get_installed_count();
 }
 
 k4a_result_t KinectDevice::open() { return open(K4A_DEVICE_DEFAULT); }
@@ -22,39 +26,39 @@ void KinectDevice::configure(Isolate *i, Local<Object> my_config) {
 
     mv = my_config->Get(c, STR(i, "colorFormat"));
     if (!mv.IsEmpty()) {
-        config.color_format = (k4a_image_format_t)GET_ENUM_VAL(mv, c);
+        config.color_format = (k4a_image_format_t)OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "colorResolution"));
     if (!mv.IsEmpty()) {
-        config.color_resolution = (k4a_color_resolution_t)GET_ENUM_VAL(mv, c);
+        config.color_resolution = (k4a_color_resolution_t)OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "depthMode"));
     if (!mv.IsEmpty()) {
-        config.depth_mode = (k4a_depth_mode_t)GET_ENUM_VAL(mv, c);
+        config.depth_mode = (k4a_depth_mode_t)OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "cameraFPS"));
     if (!mv.IsEmpty()) {
-        config.camera_fps = (k4a_fps_t)GET_ENUM_VAL(mv, c);
+        config.camera_fps = (k4a_fps_t)OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "synchronizedImagesOnly"));
     if (!mv.IsEmpty()) {
-        config.synchronized_images_only = GET_ENUM_VAL(mv, c);
+        config.synchronized_images_only = OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "depthDelayOffColorUsec"));
     if (!mv.IsEmpty()) {
-        config.depth_delay_off_color_usec = GET_ENUM_VAL(mv, c);
+        config.depth_delay_off_color_usec = OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "wiredSyncMode"));
     if (!mv.IsEmpty()) {
-        config.wired_sync_mode = (k4a_wired_sync_mode_t)GET_ENUM_VAL(mv, c);
+        config.wired_sync_mode = (k4a_wired_sync_mode_t)OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "subordinateDelayOffMasterUsec"));
     if (!mv.IsEmpty()) {
-        config.subordinate_delay_off_master_usec = GET_ENUM_VAL(mv, c);
+        config.subordinate_delay_off_master_usec = OBJ_GET_INT(mv, c);
     }
     mv = my_config->Get(c, STR(i, "disableStreamingIndicator"));
     if (!mv.IsEmpty()) {
-        config.disable_streaming_indicator = (bool)GET_ENUM_VAL(mv, c);
+        config.disable_streaming_indicator = (bool)OBJ_GET_INT(mv, c);
     }
 }
 
@@ -74,3 +78,58 @@ k4a_result_t KinectDevice::start_cameras() {
 }
 
 void KinectDevice::stop_cameras() { k4a_device_stop_cameras(device); }
+
+k4a_wait_result_t KinectDevice::get_capture(int32_t timeout) {
+    return k4a_device_get_capture(device, &capture, timeout);
+}
+
+void KinectDevice::release_capture() { k4a_capture_release(capture); }
+
+k4a_image_t KinectDevice::get_color_image() {
+    color_image = k4a_capture_get_color_image(capture);
+    images_set.color = color_image != 0;
+    images_set.capture |= images_set.color;
+    return color_image;
+}
+
+k4a_image_t KinectDevice::get_depth_image() {
+    depth_image = k4a_capture_get_depth_image(capture);
+    images_set.depth = depth_image != 0;
+    images_set.capture |= images_set.depth;
+    return depth_image;
+}
+
+k4a_image_t KinectDevice::get_ir_image() {
+    ir_image = k4a_capture_get_ir_image(capture);
+    images_set.ir = ir_image != 0;
+    images_set.capture |= images_set.ir;
+    return ir_image;
+}
+
+void KinectDevice::release_images() {
+    if (images_set.color) {
+        k4a_image_release(color_image);
+    }
+    if (images_set.depth) {
+        k4a_image_release(depth_image);
+    }
+    if (images_set.ir) {
+        k4a_image_release(ir_image);
+    }
+    if (images_set.capture) {
+        k4a_capture_release(capture);
+    }
+}
+
+uint8_t *KinectDevice::get_image_buffer(image_type type) {
+    if (type == image_type::DEPTH_IMAGE)
+        return k4a_image_get_buffer(depth_image);
+    if (type == image_type::IR_IMAGE) return k4a_image_get_buffer(ir_image);
+    return k4a_image_get_buffer(color_image);
+}
+
+size_t KinectDevice::get_image_size(image_type type) {
+    if (type == image_type::DEPTH_IMAGE) return k4a_image_get_size(depth_image);
+    if (type == image_type::IR_IMAGE) return k4a_image_get_size(ir_image);
+    return k4a_image_get_size(color_image);
+}
