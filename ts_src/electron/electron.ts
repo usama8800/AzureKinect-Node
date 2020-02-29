@@ -6,7 +6,7 @@ import { Kinect } from '../kinect';
 const k = new Kinect();
 
 function createWindow() {
-    const width = 1000;
+    const width = 1200;
     const win = new BrowserWindow({
         width,
         height: width * 9 / 16,
@@ -22,24 +22,19 @@ function createWindow() {
     });
 }
 
-let start = false;
-async function startCameras(e: Electron.IpcMainEvent, args: Config) {
-    while (start) {
-        if (args.colorFormat === ColorFormat.ColorMJPG) {
-            k.capture();
-            const image = k.getColorImage();
-            if (image) {
-                const colorData = k.getImageBuffer(image);
-                const b64 = Buffer.from(colorData.buffer).toString('base64');
-                e.reply('colorImage', b64);
-                // console.log(`Sent ${b64.substring(0, 5)}`);
-                await (async (ms) => new Promise(resolve => setTimeout(resolve, ms)))(50);
-            }
-            k.releaseImagesAndCapture();
+function startCameras(e: Electron.IpcMainEvent, args: Config) {
+    if (args.colorFormat === ColorFormat.ColorMJPG) {
+        k.capture();
+        const image = k.getColorImage();
+        if (image) {
+            const imageBuffer = k.getImageBuffer(image);
+            e.reply('colorImage', imageBuffer.toString('base64'));
         }
+        k.releaseImagesAndCapture();
     }
 }
 
+let startCamerasInterval: number;
 ipcMain.on('kinect', (e, func, args) => {
     let res: Result;
     switch (func) {
@@ -67,11 +62,12 @@ ipcMain.on('kinect', (e, func, args) => {
         case 'start':
             res = k.startCameras(args);
             e.reply('start', res === Result.SUCCEEDED);
-            start = true;
+            const twiceFPS = ((args.cameraFPS * 15) || 5) * 2;
+            startCamerasInterval = setInterval(startCameras, 1000 / twiceFPS, e, args);
             startCameras(e, args);
             break;
         case 'stop':
-            start = false;
+            clearInterval(startCamerasInterval);
             k.stopCameras();
             e.reply('stop', true);
             break;

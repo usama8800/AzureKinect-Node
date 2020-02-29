@@ -2,7 +2,59 @@ const { ipcRenderer } = require('electron');
 const $ = require('jquery');
 ipcRenderer.send('kinect', 'getDeviceS/Ns');
 
-$(document).ready(function () {
+const states = {
+    open: {
+        show: ['#openView'],
+        hide: ['#notOpenView'],
+    },
+    close: {
+        show: ['#notOpenView'],
+        hide: ['#openView'],
+    },
+    start: {
+        show: ['#stopButton', '#colorImage'],
+        hide: ['#startButton'],
+    },
+    stop: {
+        show: ['#startButton'],
+        hide: ['#stopButton', '#colorImage'],
+    },
+    only720: {
+        disable: ['#1080p', '#1440p', '#2160p', '#1536p', '#3072p'],
+        check: ['#720p'],
+        enable: ['#30fps'],
+    },
+    allRes: {
+        enable: ['#1080p', '#1440p', '#2160p', '#1536p', '#3072p'],
+    },
+    no30FPS: {
+        disable: ['#30fps'],
+        uncheck: ['#30fps']
+    },
+    allFPS: {
+        enable: ['#30fps'],
+    }
+};
+
+const defaults = {
+    click: ['#depthCamera', '#nv12', '#720p', '#15fps'],
+}
+
+function setDefaults() {
+    defaults.click.forEach(s => $(s).trigger('click'));
+}
+
+function setState(stateName) {
+    const state = states[stateName];
+    state.show?.forEach(s => $(s).show());
+    state.hide?.forEach(s => $(s).hide());
+    state.disable?.forEach(s => $(s).prop('disabled', true));
+    state.enable?.forEach(s => $(s).prop('disabled', false));
+    state.check?.forEach(s => $(s).prop('checked', true));
+    state.uncheck?.forEach(s => $(s).prop('checked', false));
+}
+
+$(document).ready(() => {
     $('#refreshDevices').click(e => {
         ipcRenderer.send('kinect', 'getDeviceS/Ns');
     });
@@ -52,18 +104,31 @@ $(document).ready(function () {
             disableStreamingIndicator: $('#disableStreamingIndicator').is(':checked'),
         };
         if ($('#colorCamera').is(':checked')) {
-            config.colorResolution = +form.get('colorResolution');
+            config.colorResolution = +(form.get('colorResolution') ?? 0);
         }
         if ($('#depthCamera').is(':checked')) {
-            config.depthMode = +form.get('depthMode');
+            config.depthMode = +(form.get('depthMode') ?? 0);
         }
         ipcRenderer.send('kinect', 'start', config);
     });
     $('#stopButton').click(e => {
         ipcRenderer.send('kinect', 'stop');
     });
-
-    $('#depthCamera').trigger('click');
+    $('[name=colorFormat]').change(e => {
+        if (['nv12', 'yuy2'].includes($('[name=colorFormat]:checked').attr('id'))) {
+            setState('only720');
+        } else {
+            setState('allRes');
+        }
+    });
+    $('[name=colorResolution]').change(e => {
+        if ($('[name=colorResolution]:checked').attr('id') === '3072p') {
+            setState('no30FPS');
+        } else {
+            setState('allFPS');
+        }
+    });
+    setDefaults();
 });
 
 ipcRenderer.on('deviceS/Ns', (e, val) => {
@@ -79,34 +144,29 @@ ipcRenderer.on('deviceS/Ns', (e, val) => {
 ipcRenderer.on('open', (e, val) => {
     $('#openDevice').prop('disabled', false);
     if (val) {
-        $('#notOpenView').hide();
-        $('#openView').show();
+        setState('open');
     } else {
         alert('Could not open device');
     }
 });
 ipcRenderer.on('close', (e, val) => {
     $('#closeDevice').prop('disabled', false);
-    $('#openView').hide();
-    $('#notOpenView').show();
+    setState('close');
 });
 
 ipcRenderer.on('start', (e, val) => {
     $('#startButton').prop('disabled', false);
     if (val) {
-        $('#startButton').hide();
-        $('#stopButton').show();
-        $('#colorImage').show();
+        setState('start');
     } else {
         alert('Could not start cameras');
     }
 });
 ipcRenderer.on('stop', (e, val) => {
     $('#stopButton').prop('disabled', false);
-    $('#startButton').show();
-    $('#stopButton').hide();
-    $('#colorImage').hide();
+    setState('stop');
 });
+
 ipcRenderer.on('colorImage', (e, image) => {
     $('#colorImage').attr('src', `data:image/jpeg;base64,${image}`);
 });

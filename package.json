@@ -9,9 +9,15 @@
     "reinstall": "npm run clean && npm run install",
     "electron": "electron www/electron/electron.js",
     "rebuild": "node-gyp rebuild --debug && tsc && electron-rebuild",
+    "test-gyp": "node-gyp rebuild && tsc && node ./www/test.js",
+    "test": "tsc && node ./www/test.js",
     "e": "npm run electron",
     "r": "npm run rebuild",
-    "t": "node www/test.js"
+    "t": "tsc && npm run e",
+    "gypmon": "nodemon -e cc,h -w cc_src -x node-gyp rebuild",
+    "egypmon": "nodemon -e cc,h -w cc_src -x electron-rebuild",
+    "testmon": "nodemon -e ts -w ts_src -x npm test",
+    "emon": "nodemon -e ts,html,js,css -w ts_src -x npm run t"
   },
   "license": "MIT",
   "dependencies": {
@@ -31,8 +37,7 @@
     "@types/jquery": "^3.3.32",
     "@types/node": "^12.12.28",
     "electron": "^8.0.1",
-    "nodemon": "^2.0.2",
-    "rimraf": "^3.0.2"
+    "nodemon": "^2.0.2"
   },
   "gypfile": true
 }

@@ -4,8 +4,12 @@ import { KinectImage } from './kinectImage';
 const kinect = bindings('azurekinect_node');
 
 const colorImage = new KinectImage(ImageType.COLOR);
+const depthImage = new KinectImage(ImageType.DEPTH);
+const irImage = new KinectImage(ImageType.IR);
 
 export class Kinect {
+
+    private config: Config = {};
 
     getNumConnectedDevices(): number {
         return kinect.getNumConnectedDevices();
@@ -22,6 +26,7 @@ export class Kinect {
     }
 
     configure(config: Config) {
+        this.config = config;
         kinect.configure(config);
     }
 
@@ -36,6 +41,7 @@ export class Kinect {
     }
 
     stopCameras() {
+        kinect.releaseImagesAndCapture();
         kinect.stopCameras();
     }
 
@@ -51,12 +57,24 @@ export class Kinect {
         return undefined;
     }
 
+    getDepthImage(): KinectImage | undefined {
+        const res = kinect.getDepthImage();
+        if (res) { return depthImage; }
+        return undefined;
+    }
+
+    getIRImage(): KinectImage | undefined {
+        const res = kinect.getIRImage();
+        if (res) { return irImage; }
+        return undefined;
+    }
+
     releaseImagesAndCapture() {
         kinect.releaseImagesAndCapture();
     }
 
-    getImageBuffer(image: KinectImage): Int8Array {
+    getImageBuffer(image: KinectImage): Buffer {
         const data = kinect.getImageBuffer(image.type);
-        return data;
+        return Buffer.from(data);
     }
 }

@@ -151,6 +151,36 @@ void get_color_image(const FunctionCallbackInfo<Value> &args) {
         args.GetReturnValue().Set(false);
 }
 
+void get_depth_image(const FunctionCallbackInfo<Value> &args) {
+    Isolate *isolate = args.GetIsolate();
+
+    if (args.Length() > 0) {
+        ERROR(isolate, "Error: no arguments expected");
+        return;
+    }
+
+    k4a_image_t image = device->get_depth_image();
+    if (image)
+        args.GetReturnValue().Set(true);
+    else
+        args.GetReturnValue().Set(false);
+}
+
+void get_ir_image(const FunctionCallbackInfo<Value> &args) {
+    Isolate *isolate = args.GetIsolate();
+
+    if (args.Length() > 0) {
+        ERROR(isolate, "Error: no arguments expected");
+        return;
+    }
+
+    k4a_image_t image = device->get_ir_image();
+    if (image)
+        args.GetReturnValue().Set(true);
+    else
+        args.GetReturnValue().Set(false);
+}
+
 void release_images_and_capture(const FunctionCallbackInfo<Value> &args) {
     Isolate *isolate = args.GetIsolate();
 
@@ -159,8 +189,7 @@ void release_images_and_capture(const FunctionCallbackInfo<Value> &args) {
         return;
     }
 
-    device->release_images();
-    device->release_capture();
+    device->release_images_and_capture();
 }
 
 void get_image_buffer(const FunctionCallbackInfo<Value> &args) {
@@ -198,8 +227,8 @@ void initialize(Local<Object> exports) {
     NODE_SET_METHOD(exports, "stopCameras", stop_cameras);
     NODE_SET_METHOD(exports, "capture", capture);
     NODE_SET_METHOD(exports, "getColorImage", get_color_image);
-    // NODE_SET_METHOD(exports, "getDepthImage", get_depth_image);
-    // NODE_SET_METHOD(exports, "getIRImage", get_ir_image);
+    NODE_SET_METHOD(exports, "getDepthImage", get_depth_image);
+    NODE_SET_METHOD(exports, "getIRImage", get_ir_image);
     NODE_SET_METHOD(exports, "releaseImagesAndCapture",
                     release_images_and_capture);
     NODE_SET_METHOD(exports, "getImageBuffer", get_image_buffer);

@@ -9,6 +9,10 @@
     height: 100%;
 }
 
+#left {
+    min-width: 330px;
+}
+
 img {
     width: 100%;
 }

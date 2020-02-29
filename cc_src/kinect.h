@@ -39,12 +39,13 @@ class KinectDevice {
     k4a_result_t start_cameras();
     void stop_cameras();
     k4a_wait_result_t get_capture(int32_t timeout);
-    void release_capture();
     k4a_image_t get_color_image();
     k4a_image_t get_depth_image();
     k4a_image_t get_ir_image();
-    void release_images();
+    void release_images_and_capture();
     uint8_t* get_image_buffer(image_type);
     size_t get_image_size(image_type);
-    // TODO: Image object methods
+    int get_stride_bytes(image_type);
+    int get_image_width(image_type);
+    int get_image_height(image_type);
 };

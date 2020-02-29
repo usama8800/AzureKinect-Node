@@ -80,10 +80,9 @@ k4a_result_t KinectDevice::start_cameras() {
 void KinectDevice::stop_cameras() { k4a_device_stop_cameras(device); }
 
 k4a_wait_result_t KinectDevice::get_capture(int32_t timeout) {
+    images_set.capture = 1;
     return k4a_device_get_capture(device, &capture, timeout);
 }
-
-void KinectDevice::release_capture() { k4a_capture_release(capture); }
 
 k4a_image_t KinectDevice::get_color_image() {
     color_image = k4a_capture_get_color_image(capture);
@@ -106,30 +105,51 @@ k4a_image_t KinectDevice::get_ir_image() {
     return ir_image;
 }
 
-void KinectDevice::release_images() {
+void KinectDevice::release_images_and_capture() {
     if (images_set.color) {
         k4a_image_release(color_image);
+        images_set.color = 0;
     }
     if (images_set.depth) {
         k4a_image_release(depth_image);
+        images_set.depth = 0;
     }
     if (images_set.ir) {
         k4a_image_release(ir_image);
+        images_set.ir = 0;
     }
     if (images_set.capture) {
         k4a_capture_release(capture);
+        images_set.capture = 0;
     }
 }
 
 uint8_t *KinectDevice::get_image_buffer(image_type type) {
-    if (type == image_type::DEPTH_IMAGE)
-        return k4a_image_get_buffer(depth_image);
-    if (type == image_type::IR_IMAGE) return k4a_image_get_buffer(ir_image);
+    if (type == DEPTH_IMAGE) return k4a_image_get_buffer(depth_image);
+    if (type == IR_IMAGE) return k4a_image_get_buffer(ir_image);
     return k4a_image_get_buffer(color_image);
 }
 
 size_t KinectDevice::get_image_size(image_type type) {
-    if (type == image_type::DEPTH_IMAGE) return k4a_image_get_size(depth_image);
-    if (type == image_type::IR_IMAGE) return k4a_image_get_size(ir_image);
+    if (type == DEPTH_IMAGE) return k4a_image_get_size(depth_image);
+    if (type == IR_IMAGE) return k4a_image_get_size(ir_image);
     return k4a_image_get_size(color_image);
+}
+
+int KinectDevice::get_stride_bytes(image_type type) {
+    if (type == COLOR_IMAGE &&
+        config.color_format == K4A_IMAGE_FORMAT_COLOR_NV12) {
+        return k4a_image_get_stride_bytes(color_image);
+    }
+    return -1;
+}
+
+int KinectDevice::get_image_width(image_type type) {
+    if (type == COLOR_IMAGE) return k4a_image_get_width_pixels(color_image);
+    return -1;
+}
+
+int KinectDevice::get_image_height(image_type type) {
+    if (type == COLOR_IMAGE) return k4a_image_get_height_pixels(color_image);
+    return -1;
 }

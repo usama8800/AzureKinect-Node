@@ -32,27 +32,27 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label><input type="radio" name="depthMode" value="1">
+                                            <label><input type="radio" id="nfovBinned" name="depthMode" value="1">
                                                 NFOV Binned</label>
                                         </td>
                                         <td>
-                                            <label><input type="radio" name="depthMode" value="2" checked>
+                                            <label><input type="radio" id="nfovUnbinned" name="depthMode" value="2">
                                                 NFOV Unbinned</label>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label><input type="radio" name="depthMode" value="3">
+                                            <label><input type="radio" id="wfovBinned" name="depthMode" value="3">
                                                 WFOV Binned</label>
                                         </td>
                                         <td>
-                                            <label><input type="radio" name="depthMode" value="4">
+                                            <label><input type="radio" id="wfovUnbinned" name="depthMode" value="4">
                                                 WFOV Unbinned</label>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label><input type="radio" name="depthMode" value="5">
+                                            <label><input type="radio" id="passiveIR" name="depthMode" value="5">
                                                 Passive IR</label>
                                         </td>
                                     </tr>
@@ -70,19 +70,19 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label><input type="radio" name="colorFormat" value="3">
+                                                <label><input type="radio" id="bgra" name="colorFormat" value="3">
                                                     BGRA</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorFormat" value="0" checked>
+                                                <label><input type="radio" id="mjpg" name="colorFormat" value="0">
                                                     MJPG</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorFormat" value="1">
+                                                <label><input type="radio" id="nv12" name="colorFormat" value="1">
                                                     NV12</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorFormat" value="2">
+                                                <label><input type="radio" id="yuy2" name="colorFormat" value="2">
                                                     YUY2</label>
                                             </td>
                                         </tr>
@@ -95,31 +95,31 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="1" checked>
+                                                <label><input type="radio" id="720p" name="colorResolution" value="1">
                                                     720p</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="2">
+                                                <label><input type="radio" id="1080p" name="colorResolution" value="2">
                                                     1080p</label>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="3">
+                                                <label><input type="radio" id="1440p" name="colorResolution" value="3">
                                                     1440p</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="5">
+                                                <label><input type="radio" id="2160p" name="colorResolution" value="5">
                                                     2160p</label>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="4">
+                                                <label><input type="radio" id="1536p" name="colorResolution" value="4">
                                                     1536p</label>
                                             </td>
                                             <td>
-                                                <label><input type="radio" name="colorResolution" value="6">
+                                                <label><input type="radio" id="3072p" name="colorResolution" value="6">
                                                     3072p</label>
                                             </td>
                                         </tr>
@@ -133,15 +133,15 @@
                                 <table>
                                     <tr>
                                         <td>
-                                            <label><input type="radio" name="cameraFPS" value="2" checked />
+                                            <label><input type="radio" id="30fps" name="cameraFPS" value="2" />
                                                 30 FPS</label>
                                         </td>
                                         <td>
-                                            <label><input type="radio" name="cameraFPS" value="1" />
+                                            <label><input type="radio" id="15fps" name="cameraFPS" value="1" />
                                                 15 FPS</label>
                                         </td>
                                         <td>
-                                            <label><input type="radio" name="cameraFPS" value="0" />
+                                            <label><input type="radio" id="5fps" name="cameraFPS" value="0" />
                                                 5 FPS</label>
                                         </td>
                                     </tr>
@@ -160,7 +160,7 @@
                                 <table>
                                     <tr>
                                         <td>
-                                            <label><input id="synchronizedImagesOnly" type="checkbox" checked />
+                                            <label><input id="synchronizedImagesOnly" type="checkbox" />
                                                 Synchronized images only</label>
                                         </td>
                                     </tr>
