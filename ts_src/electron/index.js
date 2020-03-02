@@ -168,5 +168,5 @@ ipcRenderer.on('stop', (e, val) => {
 });
 
 ipcRenderer.on('colorImage', (e, image) => {
-    $('#colorImage').attr('src', `data:image/jpeg;base64,${image}`);
+    $('#colorImage').attr('src', image);
 });

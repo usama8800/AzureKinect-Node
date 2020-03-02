@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import Jimp from 'jimp';
 import path from 'path';
 import { ColorFormat, Config, Result } from '../defs';
 import { Kinect } from '../kinect';
@@ -23,15 +24,25 @@ function createWindow() {
 }
 
 function startCameras(e: Electron.IpcMainEvent, args: Config) {
-    if (args.colorFormat === ColorFormat.ColorMJPG) {
-        k.capture();
-        const image = k.getColorImage();
-        if (image) {
-            const imageBuffer = k.getImageBuffer(image);
-            e.reply('colorImage', imageBuffer.toString('base64'));
+    k.capture();
+    const image = k.getColorImage();
+    if (image) {
+        const imageBuffer = k.getImageBuffer(image);
+        if (args.colorFormat === ColorFormat.ColorBGRA32) {
+            const _ = new Jimp({ data: imageBuffer, width: 1280, height: 720 }, async (err, i) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                const b64 = await i.getBase64Async('image/jpeg');
+                e.reply('colorImage', b64);
+            });
+        } else if (args.colorFormat === ColorFormat.ColorMJPG) {
+            const b64 = imageBuffer.toString('base64');
+            e.reply('colorImage', `data:image/jpeg;base64,${b64}`);
         }
-        k.releaseImagesAndCapture();
     }
+    k.releaseImagesAndCapture();
 }
 
 let startCamerasInterval: number;
