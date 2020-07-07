@@ -37,7 +37,7 @@
   "devDependencies": {
     "@types/jquery": "^3.3.32",
     "@types/node": "^12.12.28",
-    "electron": "^8.0.1",
+    "electron": "^8.2.4",
     "nodemon": "^2.0.2"
   },
   "gypfile": true
